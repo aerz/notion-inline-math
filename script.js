@@ -28,15 +28,18 @@
   function start() {
     setListeners()
     firstLoad()
+      .then(() => renderToggles())
   }
 
-  function firstLoad() {
+  async function firstLoad() {
     if (!firstLoaded) {
       render()
       setTimeout(firstLoad, timerOnFirstLoad)
-    } else {
-      setTimeout(render, 2000) // render elements inside the toggle
     }
+  }
+
+  function renderToggles() {
+    setTimeout(render, 1000)
   }
 
   function setListeners() {
@@ -52,7 +55,7 @@
 
     window.addEventListener('click', function(e) {
       if (e.target.nodeName === 'polygon' || e.target.classList[0] === 'triangle' || typeof e.target.attributes.role !== 'undefined') {
-        setTimeout(render, 500)
+        renderToggles()
       }
     })
   }
