@@ -17,8 +17,7 @@
 (function inlineMathNotion() {
 
   const timerOnFirstLoad = 500
-  const timerOnKeyUp = 5000
-  const timerOnClick = 5000
+  let firstLoaded = false
 
   GM_addStyle(`
     .notion-frame span .katex {
@@ -26,19 +25,17 @@
     }
   `);
 
-  GM_setValue('firstLoad', false);
-
   function start() {
     setListeners()
     firstLoad()
   }
 
   function firstLoad() {
-    const isLoaded = GM_getValue('firstLoad', true)
-
-    if (!isLoaded) {
+    if (!firstLoaded) {
       render()
       setTimeout(firstLoad, timerOnFirstLoad)
+    } else {
+      setTimeout(render, 2000) // render elements inside the toggle
     }
   }
 
@@ -49,20 +46,22 @@
       }
     }, true);
 
-    window.addEventListener('keyup', function(e) {
-      setTimeout(render, timerOnKeyUp)
-    });
+    window.addEventListener('focusout', function(e) {
+      render()
+    })
 
     window.addEventListener('click', function(e) {
-      setTimeout(render, timerOnClick)
-    });
+      if (e.target.nodeName === 'polygon' || e.target.classList[0] === 'triangle' || typeof e.target.attributes.role !== 'undefined') {
+        setTimeout(render, 500)
+      }
+    })
   }
 
   function render() {
     const codeBlocks = document.querySelectorAll("span[style*=\"monospace\"]");
 
     if (codeBlocks.length > 0) {
-      GM_setValue('firstLoad', true);
+      firstLoaded = true
     }
 
     codeBlocks.forEach(codeBlock => {
