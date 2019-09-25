@@ -23,6 +23,15 @@
     .notion-frame span .katex {
       padding-right: 0 !important;
     }
+
+    .math-preview {
+      color: black;
+      position: absolute;
+      z-index: 999;
+      background-color: #eee;
+      padding: 5px;
+      border-radius: 5px;
+    }
   `);
 
   function start() {
@@ -57,6 +66,24 @@
       if (e.target.nodeName === 'polygon' || e.target.classList[0] === 'triangle' || typeof e.target.attributes.role !== 'undefined') {
         renderToggles()
       }
+    })
+
+    window.addEventListener('keyup', function(e) {
+      const mathBlocks = e.target.querySelectorAll("span[style*=\"monospace\"]");
+
+      if (mathBlocks.length < 1 || e.key === 'Shift') {
+        return false
+      }
+
+      mathBlocks.forEach((block, index) => {
+        const mathText = block.innerText.slice(5).trim()
+
+        let preview = document.createElement('div');
+        preview.classList.add('math-preview')
+        preview.style = `margin-top: ${45 * index}px`
+        e.target.appendChild(preview)
+        katex.render(mathText, preview, { throwOnError: true, font: 'mathit' });
+      })
     })
   }
 
