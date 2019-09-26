@@ -3,8 +3,6 @@
 // @version 0.2.1
 // @match https://www.notion.so/*
 // @grant GM_addStyle
-// @grant GM_setValue
-// @grant GM_getValue
 // @require https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.js
 // ==/UserScript==
 
@@ -31,6 +29,8 @@
       background-color: #eee;
       padding: 5px;
       border-radius: 5px;
+      top: 500px;
+      left: 400px;
     }
   `);
 
@@ -52,6 +52,18 @@
   }
 
   function setListeners() {
+
+    let mathPreviews = []
+    let mouse = {
+      x: 0,
+      y: 0
+    }
+
+    function removePreviews() {
+      mathPreviews.forEach(preview => preview.remove())
+      mathPreviews = []
+    }
+
     window.addEventListener('keydown', function(e) {
       if (e.key == "F2" && !e.ctrlKey && !e.shiftKey && !e.altKey) {
         render()
@@ -59,6 +71,7 @@
     }, true);
 
     window.addEventListener('focusout', function(e) {
+      removePreviews()
       render()
     })
 
@@ -71,19 +84,31 @@
     window.addEventListener('keyup', function(e) {
       const mathBlocks = e.target.querySelectorAll("span[style*=\"monospace\"]");
 
-      if (mathBlocks.length < 1 || e.key === 'Shift') {
+      if (mathBlocks.length < 1) {
         return false
       }
+
+      removePreviews()
 
       mathBlocks.forEach((block, index) => {
         const mathText = block.innerText.slice(5).trim()
 
         let preview = document.createElement('div');
         preview.classList.add('math-preview')
-        preview.style = `margin-top: ${45 * index}px`
-        e.target.appendChild(preview)
-        katex.render(mathText, preview, { throwOnError: true, font: 'mathit' });
+        mathPreviews.push(preview)
+        preview.style = `margin-top: ${45 * index}px; top: ${mouse.y}px; left: ${mouse.x}px;`
+        document.body.appendChild(preview)
+        katex.render(mathText, preview, { throwOnError: false, font: 'mathit' });
       })
+    })
+
+    window.addEventListener('mousemove', function(e) {
+      if (mathPreviews.length < 1) {
+        return false
+      }
+
+      mouse.x = e.clientX
+      mouse.y = e.clientY
     })
   }
 
