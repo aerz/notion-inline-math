@@ -6,12 +6,6 @@
 // @require https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.js
 // ==/UserScript==
 
-// Instructions for use:
-//   - Make sure you have at least one normal math block on your page
-//   - Use inline code starting with "math:". For example: `math: f(x) = x^2`
-//   - Press F2 to rerender all inline math. You can of course change the shortcut in the code below.
-//   - The inline math will revert to inline code when the block becomes active.
-
 (function inlineMathNotion() {
 
   const timerOnFirstLoad = 500
@@ -73,6 +67,16 @@
       return e.target.nodeName === 'polygon' || e.target.classList[0] === 'triangle' || typeof e.target.attributes.role !== 'undefined'
     }
 
+    function createTooltip() {
+      let tooltip = document.createElement('div')
+      tooltip.setAttribute('id', 'tooltip-inline-math')
+      tooltip.classList.add('tooltip')
+      tooltip.style = `top: ${mouse.y}px; left: ${mouse.x}px;`
+      tooltip.innerHTML = '<div>Math Inline Preview</div>'
+
+      return tooltip
+    }
+
     window.addEventListener('keydown', function(e) {
       if (e.key == "F2" && !e.ctrlKey && !e.shiftKey && !e.altKey) {
         render()
@@ -91,30 +95,28 @@
     })
 
     window.addEventListener('keyup', function(e) {
-      const mathBlocks = e.target.querySelectorAll("span[style*=\"monospace\"]");
+      const codeBlocks = e.target.querySelectorAll("span[style*=\"monospace\"]");
+      const mathBlocks = Array.prototype.slice.call(codeBlocks).filter(block => block.textContent.startsWith('math:'))
 
       if (mathBlocks.length < 1) {
         return false
       }
 
       removePreviews()
+      let tooltip = createTooltip()
 
-      let tooltip = document.createElement('div')
-      tooltip.setAttribute('id', 'tooltip-inline-math')
-      tooltip.classList.add('tooltip')
-      tooltip.style = `top: ${mouse.y}px; left: ${mouse.x}px;`
-      tooltip.innerHTML = '<div>Math Inline Preview</div>'
-      document.body.appendChild(tooltip)
-
-      mathBlocks.forEach((block, index) => {
-        const mathText = block.innerText.slice(5).trim()
+      mathBlocks.forEach(block => {
+        const mathText = block.textContent.slice(5).trim()
 
         let preview = document.createElement('div');
         preview.classList.add('tooltip__preview')
         mathPreviews.push(preview)
         tooltip.appendChild(preview)
+
         katex.render(mathText, preview, { throwOnError: false, font: 'mathit' });
       })
+
+      document.body.appendChild(tooltip)
     })
 
     window.addEventListener('mousemove', function(e) {
@@ -133,24 +135,19 @@
 
   function render() {
     const codeBlocks = document.querySelectorAll("span[style*=\"monospace\"]");
+    const mathBlocks = Array.prototype.slice.call(codeBlocks).filter(block => block.textContent.startsWith('math:'))
 
-    if (codeBlocks.length > 0) {
+    if (mathBlocks.length > 0) {
       firstLoaded = true
     }
 
-    codeBlocks.forEach(codeBlock => {
-      let mathText = codeBlock.textContent
+    mathBlocks.forEach(block => {
+      const mathText = block.textContent.slice(5).trim()
 
-      if (!mathText.startsWith('math:')) {
-        return false
-      }
+      block.style.color = null;
+      block.style.background = null;
 
-      codeBlock.style.color = null;
-      codeBlock.style.background = null;
-
-      mathText = mathText.slice(5).trim();
-
-      katex.render(mathText, codeBlock, { throwOnError: false, font: 'mathit' });
+      katex.render(mathText, block, { throwOnError: false, font: 'mathit' });
     });
   }
 
