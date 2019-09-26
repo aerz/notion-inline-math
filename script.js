@@ -9,7 +9,8 @@
 (function inlineMathNotion() {
 
   const timerOnFirstLoad = 500
-  let firstLoaded = false
+  let pageLoaded = false
+  let currentUrl = ''
 
   GM_addStyle(`
     .notion-frame span .katex {
@@ -40,10 +41,14 @@
   }
 
   function firstLoad() {
-    if (!firstLoaded) {
+    if (!pageLoaded) {
       render()
       setTimeout(firstLoad, timerOnFirstLoad)
     }
+  }
+
+  function updateUrl() {
+    currentUrl = window.location.href
   }
 
   function setListeners() {
@@ -92,6 +97,12 @@
       if (isToggleElement(e)) {
         setTimeout(render, 500)
       }
+
+      if (window.location.href !== currentUrl) {
+        pageLoaded = false
+        updateUrl()
+        start()
+      }
     })
 
     window.addEventListener('keyup', function(e) {
@@ -138,7 +149,7 @@
     const mathBlocks = Array.prototype.slice.call(codeBlocks).filter(block => block.textContent.startsWith('math:'))
 
     if (mathBlocks.length > 0) {
-      firstLoaded = true
+      pageLoaded = true
     }
 
     mathBlocks.forEach(block => {
