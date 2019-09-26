@@ -20,7 +20,7 @@
 
 - Install ViolentMonkey browser extension on [Firefox](https://addons.mozilla.org/es/firefox/addon/violentmonkey/) or [Chrome](https://chrome.google.com/webstore/detail/violentmonkey/jinjaccalgkegednnccohejagnlnfdag)
 - Open the ViolentMonkey Dashboard
-- Add a new script from URL and add the [script.js](https://raw.githubusercontent.com/arzaner/notion-inline-math/master/script.js) raw URL
+- Add a new script and add the [dist/main.js](https://raw.githubusercontent.com/arzaner/notion-inline-math/master/dist/main.js) code or you can download it from [Releases](https://github.com/arzaner/notion-inline-math/releases)
 - Save it
 
 # Credits

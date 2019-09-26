@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Inline Math for Notion.so
-// @version 0.2.1
+// @version 1.0.0
 // @match https://www.notion.so/*
 // @grant GM_addStyle
 // @require https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.js
