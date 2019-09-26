@@ -22,33 +22,34 @@
       padding-right: 0 !important;
     }
 
-    .math-preview {
-      color: black;
+    .tooltip {
+      color: white;
+      background-color: rgb(55, 53, 47);
+      border-radius: 8px;
+      padding: 10px;
       position: absolute;
       z-index: 999;
+    }
+
+    .tooltip__preview {
       background-color: #eee;
+      color: black;
       padding: 5px;
-      border-radius: 5px;
-      top: 500px;
-      left: 400px;
+      border-radius: 8px;
+      margin-top: 10px;
     }
   `);
 
   function start() {
     setListeners()
     firstLoad()
-      .then(() => renderToggles())
   }
 
-  async function firstLoad() {
+  function firstLoad() {
     if (!firstLoaded) {
       render()
       setTimeout(firstLoad, timerOnFirstLoad)
     }
-  }
-
-  function renderToggles() {
-    setTimeout(render, 1000)
   }
 
   function setListeners() {
@@ -61,7 +62,15 @@
 
     function removePreviews() {
       mathPreviews.forEach(preview => preview.remove())
+      const tooltip = document.getElementById('tooltip-inline-math')
+      if (tooltip) {
+        tooltip.remove()
+      }
       mathPreviews = []
+    }
+
+    function isToggleElement(e) {
+      return e.target.nodeName === 'polygon' || e.target.classList[0] === 'triangle' || typeof e.target.attributes.role !== 'undefined'
     }
 
     window.addEventListener('keydown', function(e) {
@@ -76,8 +85,8 @@
     })
 
     window.addEventListener('click', function(e) {
-      if (e.target.nodeName === 'polygon' || e.target.classList[0] === 'triangle' || typeof e.target.attributes.role !== 'undefined') {
-        renderToggles()
+      if (isToggleElement(e)) {
+        setTimeout(render, 500)
       }
     })
 
@@ -90,25 +99,35 @@
 
       removePreviews()
 
+      let tooltip = document.createElement('div')
+      tooltip.setAttribute('id', 'tooltip-inline-math')
+      tooltip.classList.add('tooltip')
+      tooltip.style = `top: ${mouse.y}px; left: ${mouse.x}px;`
+      tooltip.innerHTML = '<div>Math Inline Preview</div>'
+      document.body.appendChild(tooltip)
+
       mathBlocks.forEach((block, index) => {
         const mathText = block.innerText.slice(5).trim()
 
         let preview = document.createElement('div');
-        preview.classList.add('math-preview')
+        preview.classList.add('tooltip__preview')
         mathPreviews.push(preview)
-        preview.style = `margin-top: ${45 * index}px; top: ${mouse.y}px; left: ${mouse.x}px;`
-        document.body.appendChild(preview)
+        tooltip.appendChild(preview)
         katex.render(mathText, preview, { throwOnError: false, font: 'mathit' });
       })
     })
 
     window.addEventListener('mousemove', function(e) {
-      if (mathPreviews.length < 1) {
+      const tooltip = document.getElementById('tooltip-inline-math')
+
+      if (tooltip === null) {
         return false
       }
 
       mouse.x = e.clientX
       mouse.y = e.clientY
+
+      tooltip.style = `top: ${mouse.y}px; left: ${mouse.x}px;`
     })
   }
 
