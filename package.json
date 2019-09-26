@@ -1,0 +1,26 @@
+{
+  "name": "notion-inline-math",
+  "version": "1.0.0",
+  "description": "![notion inline math preview](preview.gif)",
+  "private": true,
+  "scripts": {
+    "build": "webpack --mode production && npm run metadata",
+    "build:dev": "webpack --mode development && npm run metadata",
+    "metadata": "node ./build/metadata.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arzaner/notion-inline-math.git"
+  },
+  "keywords": [],
+  "author": "Agustin Cisneros <agustincc2@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/arzaner/notion-inline-math/issues"
+  },
+  "homepage": "https://github.com/arzaner/notion-inline-math#readme",
+  "devDependencies": {
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
+  }
+}
