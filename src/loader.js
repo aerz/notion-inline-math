@@ -1,12 +1,8 @@
 import render from "./render";
-
-function searchMathBlocks() {
-  const codeBlocks = document.querySelectorAll("span[style*=\"monospace\"]");
-  return Array.prototype.slice.call(codeBlocks).filter(block => block.textContent.startsWith('math:'))
-}
+import elements from "./elements"
 
 function loader() {
-  if (searchMathBlocks().length < 1) {
+  if (elements.getMathBlocks().length < 1) {
     setTimeout(loader, 500)
     return false
   }

@@ -1,5 +1,6 @@
 import render from './render'
 import loader from './loader'
+import elements from './elements'
 
 let currentUrl = ''
 let mathPreviews = []
@@ -8,31 +9,13 @@ let mouse = {
   y: 0
 }
 
-function updateUrl() {
-  currentUrl = window.location.href
-}
-
 function removePreviews() {
   mathPreviews.forEach(preview => preview.remove())
-  const tooltip = document.getElementById('tooltip-inline-math')
+  const tooltip = elements.getTooltipPreview()
   if (tooltip) {
     tooltip.remove()
   }
   mathPreviews = []
-}
-
-function isToggleElement(e) {
-  return e.target.nodeName === 'polygon' || e.target.classList[0] === 'triangle' || typeof e.target.attributes.role !== 'undefined'
-}
-
-function createTooltip() {
-  let tooltip = document.createElement('div')
-  tooltip.setAttribute('id', 'tooltip-inline-math')
-  tooltip.classList.add('tooltip')
-  tooltip.style = `top: ${mouse.y}px; left: ${mouse.x}px;`
-  tooltip.innerHTML = '<div>Math Inline Preview</div>'
-
-  return tooltip
 }
 
 function keyDown(e) {
@@ -47,26 +30,25 @@ function focusOut(e) {
 }
 
 function click(e) {
-  if (isToggleElement(e)) {
+  if (elements.isToggleList(e)) {
     setTimeout(render, 500)
   }
 
   if (window.location.href !== currentUrl) {
-    updateUrl()
+    currentUrl = window.location.href
     loader()
   }
 }
 
 function keyUp(e) {
-  const codeBlocks = e.target.querySelectorAll("span[style*=\"monospace\"]");
-  const mathBlocks = Array.prototype.slice.call(codeBlocks).filter(block => block.textContent.startsWith('math:'))
+  const mathBlocks = elements.getMathBlocks()
 
   if (mathBlocks.length < 1) {
     return false
   }
 
   removePreviews()
-  let tooltip = createTooltip()
+  let tooltip = elements.createTooltipPreview(mouse.x, mouse.y)
 
   mathBlocks.forEach(block => {
     const mathText = block.textContent.slice(5).trim()
@@ -83,7 +65,7 @@ function keyUp(e) {
 }
 
 function mouseMove(e) {
-  const tooltip = document.getElementById('tooltip-inline-math')
+  const tooltip = elements.getTooltipPreview()
 
   if (tooltip === null) {
     return false
